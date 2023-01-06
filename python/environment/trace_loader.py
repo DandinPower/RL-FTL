@@ -9,13 +9,16 @@ class TraceLoader:
         self._current = 0
     
     # 將trace csv load 進來
-    def Load(self, path, length):
+    def Load(self, path, length=-1):
         PrintLog('use pandas to read csv....')
         self._traces.clear()
         df = pd.read_csv(path, header = None, delimiter=',', lineterminator='\n')
         loadCount = 0
         totalCount = len(df.index)
-        for index, row in tqdm(df.iterrows(), total=length):
+        readCount = 0
+        if length == -1: readCount = totalCount 
+        else: readCount = length 
+        for index, row in tqdm(df.iterrows(), total = readCount):
             loadCount += 1
             temp = Trace(row[0], row[1], row[2], row[3])
             self._traces.append(temp)
@@ -32,4 +35,6 @@ class TraceLoader:
     
     def GetLength(self):
         return len(self._traces)
+    
+    
     

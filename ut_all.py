@@ -1,4 +1,2 @@
-from test.python.ut_trace import *
-
-def test_Trace():
-    test_1()
+from test.python.ut_laddress import *
+from test.python.ut_lmemory import *

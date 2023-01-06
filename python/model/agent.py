@@ -9,13 +9,15 @@ def main():
     memory = LogicMemory()
     environment.SetMemory(memory)
     traceLoader = TraceLoader()
-    traceLoader.Load('trace/TPCC.trace.csv', 1000)
-    for i in tqdm(range(100)):
+    traceLoader.Load('trace/TPCC.trace.csv', 10000)
+    for i in tqdm(range(10000)):
     #for i in tqdm(range(traceLoader.GetLength())):
         environment.Step(traceLoader.GetTrace(), random.choice([True, False]))
-    print(len(memory.bits.items()))
-    for key, value in memory.bits.items():
-        print(f'address: {key}, value: {value}')
+    memory.Sort()
+    for item in memory.bits:
+        print(item)
+    if memory.CheckDuplication():
+        print('Duplicate!')
 
 if __name__ == "__main__":
     main()
