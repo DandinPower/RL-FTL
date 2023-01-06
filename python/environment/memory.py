@@ -37,58 +37,16 @@ class LogicMemory:
     def __init__(self):
         self.bits = list()  # set of LogicBits
 
-    # 處理重疊的address
-    def HandleDuplicateAddress(self, originalAddress: LogicAddress, newAddress: LogicAddress) -> None:
-        originalStart = originalAddress._address
-        originalEnd = originalAddress._address + originalAddress._offset
-        newStart = newAddress._address
-        newEnd = newAddress._address + newAddress._offset
-        if originalStart < newStart:
-            if newEnd >= originalEnd:
-                self.bits.append(LogicAddress(originalStart, newStart - originalStart, originalAddress._type))
-                self.bits.append(newAddress)
-            else:
-                self.bits.append(LogicAddress(originalStart, newStart - originalStart, originalAddress._type))
-                self.bits.append(newAddress)
-                self.bits.append(LogicAddress(newEnd, originalEnd - newEnd, originalAddress._type))
-        else:
-            if newEnd < originalEnd:
-                self.bits.append(newAddress)
-                self.bits.append(LogicAddress(newEnd, originalEnd - newEnd, originalAddress._type))
-            elif newEnd >= originalEnd:
-                self.bits.append(newAddress)
+    # 檢查memory address 數量
+    def GetLength(self) -> int:
+        return len(self.bits)
 
-    # 將一筆trace寫進memory
-    def WriteTrace(self, trace: Trace, type: bool) -> None:
-        tempLogicAddress = LogicAddress(trace._lba, trace._bytes, type)
-        check = False
-        removeIndex = -1
-        for i in range(len(self.bits)):
-            originalAddress = self.bits[i]
-            if originalAddress.IsDuplicate(tempLogicAddress):
-                self.HandleDuplicateAddress(originalAddress, tempLogicAddress)
-                removeIndex = i
-                check = True
-                break
-        if check:
-            self.bits.pop(removeIndex)
-        else:
-            self.bits.append(tempLogicAddress)
-    
     # 檢查address是否存在
     def CheckAddressIsExist(self, address: LogicAddress) -> bool:
         for item in self.bits:
             if item == address:
                 return True
         return False
-    
-    # 檢查memory address 數量
-    def GetLength(self) -> int:
-        return len(self.bits)
-    
-    # 根據address來排列bits 
-    def Sort(self) -> None:
-        self.bits = sorted(self.bits)
 
     # 檢查有無重複的address
     def CheckDuplication(self) -> None:
@@ -98,3 +56,40 @@ class LogicMemory:
                 return True
             table.add(item._address)
         return False
+
+    # 處理重疊的address
+    def HandleDuplicateAddress(self, originalAddress: LogicAddress, newAddress: LogicAddress) -> None:
+        originalStart = originalAddress._address
+        originalEnd = originalAddress._address + originalAddress._offset
+        newStart = newAddress._address
+        newEnd = newAddress._address + newAddress._offset
+        if originalStart < newStart:
+            if newEnd >= originalEnd:
+                self.bits.append(LogicAddress(originalStart, newStart - originalStart, originalAddress._type))
+            else:
+                self.bits.append(LogicAddress(originalStart, newStart - originalStart, originalAddress._type))
+                self.bits.append(LogicAddress(newEnd, originalEnd - newEnd, originalAddress._type))
+        else:
+            if newEnd < originalEnd:
+                self.bits.append(LogicAddress(newEnd, originalEnd - newEnd, originalAddress._type))
+
+    # 將一筆trace寫進memory
+    def WriteTrace(self, trace: Trace, type: bool) -> None:
+        newLogicAddress = LogicAddress(trace._lba, trace._bytes, type)
+        prepareRemoveAddress = []
+        for i in range(len(self.bits)):
+            tempOriginalLogicAddress = self.bits[i]
+            if tempOriginalLogicAddress.IsDuplicate(newLogicAddress):
+                self.HandleDuplicateAddress(tempOriginalLogicAddress, newLogicAddress)
+                prepareRemoveAddress.append(tempOriginalLogicAddress)
+        for i in range(len(prepareRemoveAddress)):
+            self.bits.remove(prepareRemoveAddress[i])
+        self.bits.append(newLogicAddress)
+        if self.CheckDuplication():
+            raise MemoryError('Address Duplicate')
+    
+    # 根據address來排列bits 
+    def Sort(self) -> None:
+        self.bits = sorted(self.bits)
+
+    

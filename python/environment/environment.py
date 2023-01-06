@@ -9,5 +9,6 @@ class Environment:
         self.memory = memory
 
     def Step(self, trace, action):
-        self.memory.WriteTrace(trace, action)
+        if trace._opCode == 2:
+            self.memory.WriteTrace(trace, action)
         
