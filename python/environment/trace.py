@@ -7,5 +7,14 @@ class Trace:
         self._lba = lba 
         self._bytes = bytes 
     
+    def GetOffset(self):
+        return self._bytes
+    
+    def IsRead(self):
+        return self._opCode == 1
+    
+    def IsWrite(self):
+        return self._opCode == 2
+
     def __str__(self):
         return f'Trace: OpCode {self._opCode}, Fid {self._fid}, Lba {self._lba}, Bytes {self._bytes}'

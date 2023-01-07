@@ -1,4 +1,4 @@
-from ..libs.cal import CompareTwoRange
+from ..libs.cal import CompareTwoRange, GetTwoRangeIntersection
 from trace import Trace
 
 # 負責模擬現在的lba使用情況
@@ -11,22 +11,33 @@ class LogicAddress:
     def SetOffset(self, offset: int) -> None:
         self._offset = offset
 
-    def __eq__(self, __o: object) -> bool:
-        if isinstance(__o, LogicAddress):
-            return (self._address == __o._address) and (self._offset == __o._offset) and (self._type == __o._type)
-        return False 
-    
+    # 檢查另一個Address有無重疊的部分
     def IsDuplicate(self, other: object):
         if not isinstance(other, LogicAddress):
             raise TypeError('Invalid Type: Not LogicAddress')
         return CompareTwoRange(self._address, self._address + self._offset, other._address, other._address + other._offset)
+    
+    # 回傳重疊的大小
+    def GetDuplicate(self, other:object):
+        if not isinstance(other, LogicAddress):
+            raise TypeError('Invalid Type: Not LogicAddress')
+        return GetTwoRangeIntersection(self._address, self._address + self._offset, other._address, other._address + other._offset)
 
+    # 檢查兩個Address是否完全一樣
+    def __eq__(self, __o: object) -> bool:
+        if isinstance(__o, LogicAddress):
+            return (self._address == __o._address) and (self._offset == __o._offset) and (self._type == __o._type)
+        return False 
+
+    # print 時顯示的字元
     def __str__(self) -> str:
-        return f'Address: {self._address}, Offset: {self._offset}, Type: {self._type}'
+        return f'[LogicAddress]Address: {self._address}, Offset: {self._offset}, Type: {self._type}'
 
+    # print 時顯示的字元
     def __repr__(self) -> str:
-        return f'Address: {self._address}, Offset: {self._offset}, Type: {self._type}'
+        return f'[LogicAddress]Address: {self._address}, Offset: {self._offset}, Type: {self._type}'
 
+    # 定義好比較的定義來讓原生的Sort可以運作
     def __lt__(self, other):
         if self._address <= other._address:
             return True
@@ -73,23 +84,35 @@ class LogicMemory:
             if newEnd < originalEnd:
                 self.bits.append(LogicAddress(newEnd, originalEnd - newEnd, originalAddress._type))
 
-    # 將一筆trace寫進memory
-    def WriteTrace(self, trace: Trace, type: bool) -> None:
+    # 將一筆trace寫進memory 並回傳duplicate的offset
+    def WriteTrace(self, trace: Trace, type: bool) -> tuple:
         newLogicAddress = LogicAddress(trace._lba, trace._bytes, type)
         prepareRemoveAddress = []
+        hotDuplicateOffset = 0
+        coldDuplicateOffset = 0
         for i in range(len(self.bits)):
             tempOriginalLogicAddress = self.bits[i]
             if tempOriginalLogicAddress.IsDuplicate(newLogicAddress):
                 self.HandleDuplicateAddress(tempOriginalLogicAddress, newLogicAddress)
                 prepareRemoveAddress.append(tempOriginalLogicAddress)
+                if tempOriginalLogicAddress._type == True:
+                    hotDuplicateOffset += tempOriginalLogicAddress.GetDuplicate(newLogicAddress)
+                else:
+                    coldDuplicateOffset += tempOriginalLogicAddress.GetDuplicate(newLogicAddress)
         for i in range(len(prepareRemoveAddress)):
             self.bits.remove(prepareRemoveAddress[i])
         self.bits.append(newLogicAddress)
         if self.CheckDuplication():
             raise MemoryError('Address Duplicate')
+        return (hotDuplicateOffset, coldDuplicateOffset)
     
     # 根據address來排列bits 
     def Sort(self) -> None:
         self.bits = sorted(self.bits)
 
-    
+    # print 時顯示的字元
+    def __str__(self) -> str:
+        output = ''
+        for item in self.bits:
+            output += f'[LogicAddress]Address: {item._address}, Offset: {item._offset}, Type: {item._type}\n'
+        return output

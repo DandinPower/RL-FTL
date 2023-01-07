@@ -1,3 +1,9 @@
-from python.model.agent import main
+from python.model.agent import Agent
 
-main()
+def main():
+    agent = Agent()
+    agent.Train()
+    agent.ShowMemoryAfterSort()
+
+if __name__ == "__main__":
+    main()
