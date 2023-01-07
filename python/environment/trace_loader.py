@@ -27,7 +27,6 @@ class TraceLoader:
             self._traces.append(temp)
             if loadCount == length:
                 break
-        print(max)
 
     def Reset(self):
         self._current = 0
