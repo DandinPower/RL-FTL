@@ -4,7 +4,6 @@ from ..environment.memory import LogicMemory
 from ..environment.scaler import RewardScaler
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 import numpy as np
-
 from dotenv import load_dotenv
 from tqdm import tqdm
 import random
@@ -35,19 +34,8 @@ class Agent:
                 self._environment.Step(tempTrace)
             elif tempTrace.IsWrite():
                 self._environment.Step(tempTrace, self.GetAction(tempTrace))
-
-    # 測試功能
-    def Test(self):
-        duplicateList = np.array(list(self._environment._duplicateRecord))
-        duplicateList = duplicateList.reshape(-1,1)
-        self._scaler2.fit(duplicateList)
-        print(duplicateList)
-        result = self._scaler2.transform(duplicateList)
-        a = self._scaler2.transform([[7913472]])[0][0]
-        b = (a - result.min()) / (result.max() - result.min())
-        b = b * (10) + 0
-        print(b)
-    
+        self._environment.WriteDuplicateHistory('python/history/duplicate_distribution.csv')
+        
     # True為Hot, False為Cold
     def GetAction(self, trace):
         return random.choice([True, False])

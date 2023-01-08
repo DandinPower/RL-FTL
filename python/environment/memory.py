@@ -102,10 +102,23 @@ class LogicMemory:
         for i in range(len(prepareRemoveAddress)):
             self.bits.remove(prepareRemoveAddress[i])
         self.bits.append(newLogicAddress)
-        if self.CheckDuplication():
-            raise MemoryError('Address Duplicate')
+        #if self.CheckDuplication():
+        #    raise MemoryError('Address Duplicate')
         return (hotDuplicateOffset, coldDuplicateOffset)
-    
+
+    # 讀取一筆trace進memory
+    def ReadTrace(self, trace: Trace) -> tuple:
+        newLogicAddress = LogicAddress(trace._lba, trace._bytes, None)
+        hotDuplicateOffset = 0
+        coldDuplicateOffset = 0
+        for tempOriginalLogicAddress in self.bits:
+            if tempOriginalLogicAddress.IsDuplicate(newLogicAddress):
+                if tempOriginalLogicAddress._type == True:
+                        hotDuplicateOffset += tempOriginalLogicAddress.GetDuplicate(newLogicAddress)
+                else:
+                    coldDuplicateOffset += tempOriginalLogicAddress.GetDuplicate(newLogicAddress)
+        return (hotDuplicateOffset, coldDuplicateOffset) 
+
     # 根據address來排列bits 
     def Sort(self) -> None:
         self.bits = sorted(self.bits)

@@ -4,6 +4,8 @@ import numpy as np
 import os
 load_dotenv()
 
+TRACE_DUPLICATE_OFFSET_MAX = int(os.getenv('TRACE_DUPLICATE_OFFSET_MAX'))
+TRACE_DUPLICATE_OFFSET_MIN = int(os.getenv('TRACE_DUPLICATE_OFFSET_MIN'))
 WRITE_ON_HOT_MAX = int(os.getenv('WRITE_ON_HOT_MAX'))
 WRITE_ON_HOT_MIN = int(os.getenv('WRITE_ON_HOT_MIN'))
 WRITE_ON_COLD_MAX = int(os.getenv('WRITE_ON_COLD_MAX'))
