@@ -21,6 +21,7 @@ class Agent:
                 action = self.GetAction(state)
                 reward, nextState = self._environment.Step(action)
                 self._history.Add(state.trace, action, reward)
+                print(state)
                 state = nextState
         self._history.WriteHistory('python/history/record.csv')
 
