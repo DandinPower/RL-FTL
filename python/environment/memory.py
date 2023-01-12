@@ -48,6 +48,10 @@ class LogicMemory:
     def __init__(self):
         self.bits = list()  # set of LogicBits
 
+    # 清除到初始狀態
+    def ResetAll(self):
+        self.bits.clear()
+
     # 檢查memory address 數量
     def GetLength(self) -> int:
         return len(self.bits)
@@ -90,20 +94,18 @@ class LogicMemory:
         prepareRemoveAddress = []
         hotDuplicateOffset = 0
         coldDuplicateOffset = 0
-        for i in range(len(self.bits)):
-            tempOriginalLogicAddress = self.bits[i]
-            if tempOriginalLogicAddress.IsDuplicate(newLogicAddress):
-                self.HandleDuplicateAddress(tempOriginalLogicAddress, newLogicAddress)
-                prepareRemoveAddress.append(tempOriginalLogicAddress)
-                if tempOriginalLogicAddress._type == True:
-                    hotDuplicateOffset += tempOriginalLogicAddress.GetDuplicate(newLogicAddress)
-                else:
-                    coldDuplicateOffset += tempOriginalLogicAddress.GetDuplicate(newLogicAddress)
+        for tempOriginalLogicAddress in self.bits:
+            if tempOriginalLogicAddress.IsDuplicate(newLogicAddress) == False:
+                continue
+            self.HandleDuplicateAddress(tempOriginalLogicAddress, newLogicAddress)
+            prepareRemoveAddress.append(tempOriginalLogicAddress)
+            if tempOriginalLogicAddress._type:
+                hotDuplicateOffset += tempOriginalLogicAddress.GetDuplicate(newLogicAddress)
+            else:
+                coldDuplicateOffset += tempOriginalLogicAddress.GetDuplicate(newLogicAddress)
         for i in range(len(prepareRemoveAddress)):
             self.bits.remove(prepareRemoveAddress[i])
         self.bits.append(newLogicAddress)
-        #if self.CheckDuplication():
-        #    raise MemoryError('Address Duplicate')
         return (hotDuplicateOffset, coldDuplicateOffset)
 
     # 讀取一筆trace進memory
@@ -112,11 +114,12 @@ class LogicMemory:
         hotDuplicateOffset = 0
         coldDuplicateOffset = 0
         for tempOriginalLogicAddress in self.bits:
-            if tempOriginalLogicAddress.IsDuplicate(newLogicAddress):
-                if tempOriginalLogicAddress._type == True:
-                        hotDuplicateOffset += tempOriginalLogicAddress.GetDuplicate(newLogicAddress)
-                else:
-                    coldDuplicateOffset += tempOriginalLogicAddress.GetDuplicate(newLogicAddress)
+            if tempOriginalLogicAddress.IsDuplicate(newLogicAddress) == False:
+                continue
+            if tempOriginalLogicAddress._type:
+                    hotDuplicateOffset += tempOriginalLogicAddress.GetDuplicate(newLogicAddress)
+            else:
+                coldDuplicateOffset += tempOriginalLogicAddress.GetDuplicate(newLogicAddress)
         return (hotDuplicateOffset, coldDuplicateOffset) 
 
     # 根據address來排列bits 
@@ -124,7 +127,7 @@ class LogicMemory:
         self.bits = sorted(self.bits)
 
     # print 時顯示的字元
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         output = ''
         for item in self.bits:
             output += f'[LogicAddress]Address: {item._address}, Offset: {item._offset}, Type: {item._type}\n'

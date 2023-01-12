@@ -24,14 +24,24 @@ class TraceLoader:
             if loadCount == length:
                 break
 
-    def Reset(self):
+    def ResetAll(self):
         self._current = 0
 
     def GetTrace(self):
         index = self._current 
         self._current += 1
+        if self._current == len(self._traces):
+            self._current = 0
         return self._traces[index]
     
+    def GetWriteTrace(self):        
+        getWriteTrace = False
+        while getWriteTrace != True:
+            trace = self.GetTrace()
+            if trace.IsWrite():
+                getWriteTrace = True 
+                return trace
+        
     def GetLength(self):
         return len(self._traces)
     
