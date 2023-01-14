@@ -34,3 +34,9 @@ class StateLoader:
         state = State(trace=trace, fid_token=fid_token, lba_difference=lba_difference, num_bytes=trace._bytes)
         self._lastTrace = trace
         return state
+
+    def Preprocess(self, state):
+        fid_token = state[1]
+        lba_difference = state[2]
+        num_bytes = state[3]
+        return (fid_token, lba_difference, num_bytes)

@@ -22,7 +22,7 @@ class QModel(tf.keras.Model):
         self.relu = tf.keras.layers.ReLU()
         
     def call(self, inputs):
-        x = self.layer1(x)
+        x = self.layer1(inputs)
         x = self.relu(x)
         x = self.layer2(x)
         x = self.relu(x)
