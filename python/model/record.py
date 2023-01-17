@@ -7,12 +7,16 @@ class TrainHistory:
         self.rewards = []
         self.actions = []
         self.epsilon = []
+        self.hotBlock = []
+        self.hotBytes = []
 
     def AddHistory(self, datas):
         self.episodes.append(datas[0])
         self.rewards.append(datas[1])
         self.actions.append(datas[2])
         self.epsilon.append(datas[3])
+        self.hotBlock.append(datas[4])
+        self.hotBytes.append(datas[5])
 
     @staticmethod
     def _moving_average(x, periods=5):
@@ -39,8 +43,10 @@ class TrainHistory:
         mean_reward = self._moving_average(self.rewards, periods=5)
         lines.append(ax1.plot(mean_reward, label="rewards", color="C2")[0])    
         ax2 = ax1.twinx()
-        ax2.set_ylabel('Epsilon')
+        ax2.set_ylabel('Epsilon & Hot Block & HotBytes')
         lines.append(ax2.plot(self.epsilon, label="epsilon", color="C3")[0])
+        lines.append(ax2.plot(self.hotBlock, label="block ratio", color="purple")[0])
+        lines.append(ax2.plot(self.hotBytes, label="bytes ratio", color="yellow")[0])
         labs = [l.get_label() for l in lines]
         ax1.legend(lines, labs, loc=3)
         plt.savefig(path)

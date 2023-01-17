@@ -25,6 +25,28 @@ class Agent:
         self._hyperParameter = HyperParameter()
         self._valueNetworks = ValueNetworks()
         self._valueNetworks.SetActionSpace(self._environment._actionSpace)
+
+    # 計算hot cold block ratio
+    def GetHotColdBlockRatio(self) -> tuple:
+        (hot, cold) = self._environment._memory.GetHotColdBlockNums()
+        total = hot + cold
+        hotRatio = 0.0
+        coldRatio = 0.0
+        if total != 0:
+            hotRatio = hot / total 
+            coldRatio = cold / total 
+        return (hotRatio, coldRatio)
+
+    # 計算hot cold bytes ratio
+    def GetHotColdBytesRatio(self) -> tuple:
+        (hot, cold) = self._environment._memory.GetHotColdBytes()
+        total = hot + cold
+        hotRatio = 0.0
+        coldRatio = 0.0
+        if total != 0:
+            hotRatio = hot / total 
+            coldRatio = cold / total 
+        return (hotRatio, coldRatio)
         
     # 每一次的遊戲
     def Episode(self, episode):
@@ -39,8 +61,10 @@ class Agent:
             if episode > WARM_UP_EPISODES:
                 X = self._buffer.GetBatchData(BATCH_SIZE)
                 self._valueNetworks.Optimize(X)
-        self._trainHistory.AddHistory([episode, rewardSum, MAX_STEP, self._hyperParameter._epsilon])
-        return rewardSum 
+        (hotBlockRatio, _) = self.GetHotColdBlockRatio()
+        (hotBytesRatio, _) = self.GetHotColdBytesRatio()
+        self._trainHistory.AddHistory([episode, rewardSum, MAX_STEP, self._hyperParameter._epsilon, hotBlockRatio, hotBytesRatio])
+        return rewardSum
 
     # train 
     def Train(self):

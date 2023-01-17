@@ -8,6 +8,23 @@ class LogicAddress:
         self._offset = offset  
         self._type = type
 
+        # 檢查兩個Address是否完全一樣
+    def __eq__(self, __o: object) -> bool:
+        if isinstance(__o, LogicAddress):
+            return (self._address == __o._address) and (self._offset == __o._offset) and (self._type == __o._type)
+        return False 
+
+    # print 時顯示的字元
+    def __repr__(self) -> str:
+        return f'[LogicAddress]Address: {self._address}, Offset: {self._offset}, Type: {self._type}'
+
+    # 定義好比較的定義來讓原生的Sort可以運作
+    def __lt__(self, other):
+        if self._address <= other._address:
+            return True
+        elif self._address > other._address:
+            return False
+
     def SetOffset(self, offset: int) -> None:
         self._offset = offset
 
@@ -23,30 +40,20 @@ class LogicAddress:
             raise TypeError('Invalid Type: Not LogicAddress')
         return GetTwoRangeIntersection(self._address, self._address + self._offset, other._address, other._address + other._offset)
 
-    # 檢查兩個Address是否完全一樣
-    def __eq__(self, __o: object) -> bool:
-        if isinstance(__o, LogicAddress):
-            return (self._address == __o._address) and (self._offset == __o._offset) and (self._type == __o._type)
-        return False 
-
-    # print 時顯示的字元
-    def __str__(self) -> str:
-        return f'[LogicAddress]Address: {self._address}, Offset: {self._offset}, Type: {self._type}'
+class LogicMemory:
+    def __init__(self):
+        self.bits = list()  # set of LogicAddress
 
     # print 時顯示的字元
     def __repr__(self) -> str:
-        return f'[LogicAddress]Address: {self._address}, Offset: {self._offset}, Type: {self._type}'
+        output = ''
+        for item in self.bits:
+            output += f'[LogicAddress]Address: {item._address}, Offset: {item._offset}, Type: {item._type}\n'
+        return output
 
-    # 定義好比較的定義來讓原生的Sort可以運作
-    def __lt__(self, other):
-        if self._address <= other._address:
-            return True
-        elif self._address > other._address:
-            return False
-
-class LogicMemory:
-    def __init__(self):
-        self.bits = list()  # set of LogicBits
+    # 根據address來排列bits 
+    def Sort(self) -> None:
+        self.bits = sorted(self.bits)
 
     # 清除到初始狀態
     def ResetAll(self):
@@ -122,13 +129,24 @@ class LogicMemory:
                 coldDuplicateOffset += tempOriginalLogicAddress.GetDuplicate(newLogicAddress)
         return (hotDuplicateOffset, coldDuplicateOffset) 
 
-    # 根據address來排列bits 
-    def Sort(self) -> None:
-        self.bits = sorted(self.bits)
-
-    # print 時顯示的字元
-    def __repr__(self) -> str:
-        output = ''
-        for item in self.bits:
-            output += f'[LogicAddress]Address: {item._address}, Offset: {item._offset}, Type: {item._type}\n'
-        return output
+    # 取得(Hot, Cold) Block數量
+    def GetHotColdBlockNums(self) -> int:
+        hotCount = 0
+        coldCount = 0
+        for address in self.bits:
+            if address._type:
+                hotCount += 1
+            else:
+                coldCount += 1
+        return (hotCount, coldCount)
+    
+    # 取得(Hot, Cold) Bytes長度
+    def GetHotColdBytes(self) -> int:
+        hotBytes = 0
+        coldBytes = 0
+        for address in self.bits:
+            if address._type:
+                hotBytes += address._offset
+            else:
+                coldBytes += address._offset
+        return (hotBytes, coldBytes)
