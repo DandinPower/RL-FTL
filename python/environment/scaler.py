@@ -1,4 +1,3 @@
-from sklearn.preprocessing import StandardScaler
 from dotenv import load_dotenv
 import numpy as np
 import os

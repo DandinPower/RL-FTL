@@ -1,5 +1,5 @@
 from python.model.agent import Agent
-from python.libs.graph import Graph
+#from python.libs.graph import Graph
 
 def main():
     agent = Agent()
