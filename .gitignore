@@ -1,3 +1,4 @@
 *.trace.csv
+*_evaluation.csv
 __pycache__
 .pytest_cache

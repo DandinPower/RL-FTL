@@ -42,7 +42,7 @@ class TraceLoader:
                 getWriteTrace = True 
                 return trace
         
-    def GetLength(self):
+    def __len__(self):
         return len(self._traces)
     
     def GetAddresses(self):
