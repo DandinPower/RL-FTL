@@ -1,9 +1,11 @@
-from ..environment.environment import Environment
+from ..environment.environment import Environment, ActionSpace
 from ..libs.history import History
 from .buffer import ReplayBuffer
 from .record import TrainHistory
 from .networks import ValueNetworks
 from .parameter import HyperParameter
+from .inference import InferenceLoader
+from sklearn.metrics import confusion_matrix
 from dotenv import load_dotenv
 from tqdm import tqdm
 import numpy as np
@@ -61,8 +63,20 @@ class Agent:
         self._valueNetworks.SaveWeight()
         self._trainHistory.ShowHistory(TRAIN_HISTORY_PATH)
 
+class InferenceAgent:
+    def __init__(self):
+        self._inferenceLoader = InferenceLoader()
+        self._valueNetworks = ValueNetworks()
+        self._valueNetworks.SetActionSpace(ActionSpace())
+
     def Inference(self):
+        self._inferenceLoader.Load()
         self._valueNetworks.LoadWeight()
-        # 讀取statistic_evaluation.csv並將其分成X, Y
-        # 讓self._valueNetworks.GetModelAction進行預測並紀錄y_pred
-        # 讓y_pred跟Y進行比較並劃出confusion matrixd
+        yTarget = self._inferenceLoader._Y
+        xTarget = self._inferenceLoader._X
+        yPred = []
+        inference_iter = tqdm(np.arange(len(yTarget)))
+        for i in inference_iter:
+            yPred.append(self._valueNetworks.GetModelAction(xTarget[i], 0))
+        confusionMatrix = confusion_matrix(yTarget, yPred)
+        print(confusionMatrix)

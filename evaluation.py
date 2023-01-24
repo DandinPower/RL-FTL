@@ -1,5 +1,5 @@
 from python.libs.statistic import Entries
-from python.model.agent import Agent
+from python.model.agent import Agent, InferenceAgent
 from python.environment.trace_loader import TraceLoader
 from dotenv import load_dotenv
 import os
@@ -23,7 +23,7 @@ def GetTargetAnswer():
     entries.Write(TARGET_ANSWER_PATH)
 
 def main():
-    agent = Agent()
+    agent = InferenceAgent()
     agent.Inference()
 
 if __name__ == "__main__":
