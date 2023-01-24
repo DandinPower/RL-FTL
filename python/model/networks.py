@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 import os
 load_dotenv()
 
+WEIGHT_PATH = os.getenv('WEIGHT_PATH')
+
 PARAMETER_NUMS = int(os.getenv('PARAMETER_NUMS'))
 HIDDEN_SIZE = int(os.getenv('HIDDEN_SIZE'))
 ACTION_NUMS = int(os.getenv('ACTION_NUMS'))
@@ -55,3 +57,12 @@ class ValueNetworks:
         else:
             q_values = self._net(np.array([state],dtype = np.float32))
             return np.argmax(q_values) == 1
+        
+    # 儲存q model參數
+    def SaveWeight(self):
+        self._net.save_weights(WEIGHT_PATH)
+
+    # 讀取參數
+    def LoadWeight(self):
+        self._net(np.zeros((1, PARAMETER_NUMS), dtype = np.float32))
+        self._net.load_weights(WEIGHT_PATH)

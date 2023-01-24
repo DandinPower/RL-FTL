@@ -79,4 +79,5 @@ class Agent:
                 self._hyperParameter.UpdateLearningRate(i - WARM_UP_EPISODES + 1)
                 self._valueNetworks.UpdateOptimizerLR(self._hyperParameter._lr)
             train_iter.set_postfix_str(f"reward_sum: {rewardSum}")
+        self._valueNetworks.SaveWeight()
         self._trainHistory.ShowHistory(TRAIN_HISTORY_PATH)
