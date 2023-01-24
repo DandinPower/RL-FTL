@@ -42,6 +42,28 @@ class Environment:
         self._tempState = self._stateLoader.GetState()
         return self._stateLoader.Preprocess(self._tempState)
 
+    # 計算hot cold block ratio
+    def GetHotColdBlockRatio(self) -> tuple:
+        (hot, cold) = self._memory.GetHotColdBlockNums()
+        total = hot + cold
+        hotRatio = 0.0
+        coldRatio = 0.0
+        if total != 0:
+            hotRatio = hot / total 
+            coldRatio = cold / total 
+        return (hotRatio, coldRatio)
+
+    # 計算hot cold bytes ratio
+    def GetHotColdBytesRatio(self) -> tuple:
+        (hot, cold) = self._memory.GetHotColdBytes()
+        total = hot + cold
+        hotRatio = 0.0
+        coldRatio = 0.0
+        if total != 0:
+            hotRatio = hot / total 
+            coldRatio = cold / total 
+        return (hotRatio, coldRatio)
+
     # 回傳reward, nextState
     def Step(self, action):
         dynamicReward = self._dynamicReward.Step(self._tempState.trace, action)

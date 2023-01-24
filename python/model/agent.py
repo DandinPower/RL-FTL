@@ -26,28 +26,6 @@ class Agent:
         self._hyperParameter = HyperParameter()
         self._valueNetworks = ValueNetworks()
         self._valueNetworks.SetActionSpace(self._environment._actionSpace)
-
-    # 計算hot cold block ratio
-    def GetHotColdBlockRatio(self) -> tuple:
-        (hot, cold) = self._environment._memory.GetHotColdBlockNums()
-        total = hot + cold
-        hotRatio = 0.0
-        coldRatio = 0.0
-        if total != 0:
-            hotRatio = hot / total 
-            coldRatio = cold / total 
-        return (hotRatio, coldRatio)
-
-    # 計算hot cold bytes ratio
-    def GetHotColdBytesRatio(self) -> tuple:
-        (hot, cold) = self._environment._memory.GetHotColdBytes()
-        total = hot + cold
-        hotRatio = 0.0
-        coldRatio = 0.0
-        if total != 0:
-            hotRatio = hot / total 
-            coldRatio = cold / total 
-        return (hotRatio, coldRatio)
         
     # 每一次的遊戲
     def Episode(self, episode):
@@ -55,6 +33,7 @@ class Agent:
         rewardSum = 0
         for i in range(MAX_STEP):
             action = self._valueNetworks.GetModelAction(state, self._hyperParameter._epsilon)
+            #action = False
             reward, nextState = self._environment.Step(action)
             rewardSum += reward 
             self._buffer.Add(state, action, reward, nextState)
@@ -62,8 +41,8 @@ class Agent:
             if episode > WARM_UP_EPISODES:
                 X = self._buffer.GetBatchData(BATCH_SIZE)
                 self._valueNetworks.Optimize(X)
-        (hotBlockRatio, _) = self.GetHotColdBlockRatio()
-        (hotBytesRatio, _) = self.GetHotColdBytesRatio()
+        (hotBlockRatio, _) = self._environment.GetHotColdBlockRatio()
+        (hotBytesRatio, _) = self._environment.GetHotColdBytesRatio()
         self._trainHistory.AddHistory([episode, rewardSum, MAX_STEP, self._hyperParameter._epsilon, hotBlockRatio, hotBytesRatio])
         return rewardSum
 
@@ -81,3 +60,9 @@ class Agent:
             train_iter.set_postfix_str(f"reward_sum: {rewardSum}")
         self._valueNetworks.SaveWeight()
         self._trainHistory.ShowHistory(TRAIN_HISTORY_PATH)
+
+    def Inference(self):
+        self._valueNetworks.LoadWeight()
+        # 讀取statistic_evaluation.csv並將其分成X, Y
+        # 讓self._valueNetworks.GetModelAction進行預測並紀錄y_pred
+        # 讓y_pred跟Y進行比較並劃出confusion matrixd
