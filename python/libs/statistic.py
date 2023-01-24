@@ -9,11 +9,12 @@ PAGE_SIZE = 4096
 
 class WriteEntry:
     increment_id = 0
-    def __init__(self, fid, address, offset) -> None:
+    def __init__(self, fid, address, offset, action) -> None:
         self._fid = fid
         self._address = address
         self._offset = offset  
         self._id = WriteEntry.increment_id
+        self._action = action
         self._type = False
         self._free = LBA_SIZE * PAGE_SIZE
         self.__class__.increment_id += 1
@@ -53,8 +54,12 @@ class Entries:
         self._entries = []
         self._notFinishEntries = []
 
-    def Add(self, fid, address, offset):
-        tempEntry = WriteEntry(fid, address, offset)
+    def ResetAll(self):
+        self._entries.clear()
+        self._notFinishEntries.clear()
+
+    def Add(self, fid, address, offset, action):
+        tempEntry = WriteEntry(fid, address, offset, action)
         removeList = []
         for entry in self._notFinishEntries:
             entry.NewEntry(tempEntry)
@@ -64,6 +69,15 @@ class Entries:
             self._notFinishEntries.remove(entry)
             self._entries.append(entry)
         self._notFinishEntries.append(tempEntry)
+
+    def GetFinishLength(self):
+        return len(self._entries)
+
+    def GetFinishEntriesAndClear(self):
+        self._entries.sort()
+        finishEntries = self._entries.copy()
+        self._entries.clear()
+        return finishEntries
 
     def Write(self, path):
         tempResult = []

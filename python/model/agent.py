@@ -15,6 +15,7 @@ MAX_STEP = int(os.getenv('MAX_STEP'))
 WARM_UP_EPISODES = int(os.getenv('WARM_UP_EPISODES'))
 BATCH_SIZE = int(os.getenv('BATCH_SIZE'))
 UPADTE_RATE = int(os.getenv('UPDATE_RATE'))
+TRAIN_HISTORY_PATH = os.getenv('TRAIN_HISTORY_PATH')
 
 class Agent:
     def __init__(self):
@@ -78,4 +79,4 @@ class Agent:
                 self._hyperParameter.UpdateLearningRate(i - WARM_UP_EPISODES + 1)
                 self._valueNetworks.UpdateOptimizerLR(self._hyperParameter._lr)
             train_iter.set_postfix_str(f"reward_sum: {rewardSum}")
-        self._trainHistory.ShowHistory('python/history/q_version1.jpg')
+        self._trainHistory.ShowHistory(TRAIN_HISTORY_PATH)
