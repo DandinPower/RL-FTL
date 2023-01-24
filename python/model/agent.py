@@ -33,7 +33,7 @@ class Agent:
         rewardSum = 0
         for i in range(MAX_STEP):
             action = self._valueNetworks.GetModelAction(state, self._hyperParameter._epsilon)
-            #action = False
+            #action = True
             reward, nextState = self._environment.Step(action)
             rewardSum += reward 
             self._buffer.Add(state, action, reward, nextState)
