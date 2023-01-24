@@ -1,9 +1,11 @@
-from python.model.agent import Agent
+from python.model.agent import Agent, InferenceAgent
 #from python.libs.graph import Graph
 
 def main():
     agent = Agent()
     agent.Train()
+    inferenceAgent = InferenceAgent()
+    inferenceAgent.Inference()
     
     #graph = Graph()
     #graph.ReadFromCsv('python/history/duplicate_distribution.csv')

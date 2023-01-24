@@ -44,4 +44,3 @@ class InferenceLoader:
             self._X.append((fid_token, lba_difference, num_bytes))
             if self._totalCount == totalLength:
                 break
-        

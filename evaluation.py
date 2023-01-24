@@ -6,10 +6,8 @@ import os
 load_dotenv()
 
 TARGET_ANSWER_PATH = os.getenv('TARGET_ANSWER_PATH')
-
 TRACE_FILE_PATH = os.getenv('TRACE_FILE_PATH')
 TRACE_LOAD_LENGTH = int(os.getenv('TRACE_LOAD_LENGTH'))
-
 LBA_SIZE = int(os.getenv('LBA_SIZE'))
 PAGE_SIZE = 4096
 

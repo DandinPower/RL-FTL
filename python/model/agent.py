@@ -6,6 +6,8 @@ from .networks import ValueNetworks
 from .parameter import HyperParameter
 from .inference import InferenceLoader
 from sklearn.metrics import confusion_matrix
+from mlxtend.plotting import plot_confusion_matrix
+import matplotlib.pyplot as plt
 from dotenv import load_dotenv
 from tqdm import tqdm
 import numpy as np
@@ -78,5 +80,6 @@ class InferenceAgent:
         inference_iter = tqdm(np.arange(len(yTarget)))
         for i in inference_iter:
             yPred.append(self._valueNetworks.GetModelAction(xTarget[i], 0))
-        confusionMatrix = confusion_matrix(yTarget, yPred)
-        print(confusionMatrix)
+        confusionMatrix = confusion_matrix(yTarget, yPred) 
+        disp = plot_confusion_matrix(conf_mat = confusionMatrix)
+        plt.savefig("confusion_matrix.png")
