@@ -54,5 +54,8 @@ class FrequencyTokenizer:
     def __getitem__(self, key):
         self.Add(key)
         return self.GetToken(key)
+    
+    def ResetAll(self):
+        self._datas.clear()
 
 

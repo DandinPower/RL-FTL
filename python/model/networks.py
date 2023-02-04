@@ -25,8 +25,8 @@ class ValueNetworks:
         self._loss = tf.keras.losses.Huber()
 
     def UpdateTargetNetwork(self):
-        self._targetNet(np.array([[0.0, 0.0, 0.0]]))
-        self._net(np.array([[0.0, 0.0, 0.0]]))
+        self._targetNet(np.zeros((1, PARAMETER_NUMS), dtype = np.float32))
+        self._net(np.zeros((1, PARAMETER_NUMS), dtype = np.float32))
         self._targetNet.set_weights(self._net.get_weights())
 
     def UpdateOptimizerLR(self, lr):

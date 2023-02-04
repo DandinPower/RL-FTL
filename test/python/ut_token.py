@@ -8,6 +8,7 @@ LBA_DIFF_SAMPLE_1 = int(os.getenv('LBA_DIFF_SAMPLE_1'))
 LBA_DIFF_SAMPLE_2 = int(os.getenv('LBA_DIFF_SAMPLE_2'))
 FID_FREQUENCY_SAMPLE_SIZE = int(os.getenv('FID_FREQUENCY_SAMPLE_SIZE'))
 FID_FREQUENCY_SAMPLE_RANGE = int(os.getenv('FID_FREQUENCY_SAMPLE_RANGE'))
+NUM_BYTES_BIGGER_THAN_LBA = int(os.getenv('NUM_BYTES_BIGGER_THAN_LBA'))
 
 def test_RangeTokenizer_1():
     tokenizer = RangeTokenizer(LBA_DIFF_SAMPLE_0, LBA_DIFF_SAMPLE_1, LBA_DIFF_SAMPLE_2)
@@ -28,6 +29,11 @@ def test_RangeTokenizer_1():
     assert 3 == tokenizer[-(LBA_DIFF_SAMPLE_2 + 1)]
     assert 3 == tokenizer[LBA_DIFF_SAMPLE_2 * 2]
     assert 3 == tokenizer[-(LBA_DIFF_SAMPLE_2 * 2)]
+
+def test_RangeTokenizer_2():
+    tokenizer = RangeTokenizer(NUM_BYTES_BIGGER_THAN_LBA)
+    assert 0 == tokenizer[16777215]
+    assert 1 == tokenizer[16777216]
 
 def test_FrequencyTokenizer_1():
     tokenizer = FrequencyTokenizer(FID_FREQUENCY_SAMPLE_SIZE, FID_FREQUENCY_SAMPLE_RANGE)
