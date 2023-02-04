@@ -20,6 +20,7 @@ WARM_UP_EPISODES = int(os.getenv('WARM_UP_EPISODES'))
 BATCH_SIZE = int(os.getenv('BATCH_SIZE'))
 UPADTE_RATE = int(os.getenv('UPDATE_RATE'))
 TRAIN_HISTORY_PATH = os.getenv('TRAIN_HISTORY_PATH')
+INFERENCE_HISTORY_PATH = os.getenv('INFERENCE_HISTORY_PATH')
 
 class Agent:
     def __init__(self):
@@ -71,6 +72,19 @@ class InferenceAgent:
         self._valueNetworks = ValueNetworks()
         self._valueNetworks.SetActionSpace(ActionSpace())
 
+    def ConfusionMatrix(self, path ,yTrue, yPred):
+        confusionMatrix = confusion_matrix(yTrue, yPred) 
+        tn, fp, fn, tp = confusionMatrix.ravel()
+        acc = (tp+tn)/(tp+fp+fn+tn)
+        pre = tp/(tp+fp)
+        recall = tp/(tp+fn)
+        F1 = 2 / ((1/ pre) + (1/ recall))
+        with open(path, "w") as file:
+            file.write(f'tn: {tn}, fp: {fp}, fn: {fn}, tp: {tp}\n')
+            file.write(f'acc: {acc}, pre: {pre}, recall: {recall}, F1: {F1}\n')
+        disp = plot_confusion_matrix(conf_mat = confusionMatrix)
+        plt.savefig("confusion_matrix.png")
+
     def Inference(self):
         self._inferenceLoader.Load()
         self._valueNetworks.LoadWeight()
@@ -80,6 +94,4 @@ class InferenceAgent:
         inference_iter = tqdm(np.arange(len(yTarget)))
         for i in inference_iter:
             yPred.append(self._valueNetworks.GetModelAction(xTarget[i], 0))
-        confusionMatrix = confusion_matrix(yTarget, yPred) 
-        disp = plot_confusion_matrix(conf_mat = confusionMatrix)
-        plt.savefig("confusion_matrix.png")
+        self.ConfusionMatrix(INFERENCE_HISTORY_PATH, yTarget, yPred)
