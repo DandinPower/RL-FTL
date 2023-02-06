@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-from .q_model import QModel
+from .q_model import QModel, QEmbeddingModel
 from ..environment.environment import ActionSpace
 from dotenv import load_dotenv
 import os
@@ -9,6 +9,7 @@ load_dotenv()
 WEIGHT_PATH = os.getenv('WEIGHT_PATH')
 
 PARAMETER_NUMS = int(os.getenv('PARAMETER_NUMS'))
+EMBEDDING_SIZE = int(os.getenv('EMBEDDING_SIZE'))
 HIDDEN_SIZE = int(os.getenv('HIDDEN_SIZE'))
 ACTION_NUMS = int(os.getenv('ACTION_NUMS'))
 
@@ -19,8 +20,10 @@ RNG = np.random.default_rng(100)
 
 class ValueNetworks:
     def __init__(self):
-        self._net = QModel(PARAMETER_NUMS, HIDDEN_SIZE, ACTION_NUMS)
-        self._targetNet = QModel(PARAMETER_NUMS, HIDDEN_SIZE, ACTION_NUMS)
+        #self._net = QModel(PARAMETER_NUMS, HIDDEN_SIZE, ACTION_NUMS)
+        #self._targetNet = QModel(PARAMETER_NUMS, HIDDEN_SIZE, ACTION_NUMS)
+        self._net = QEmbeddingModel(EMBEDDING_SIZE, HIDDEN_SIZE, ACTION_NUMS)
+        self._targetNet = QEmbeddingModel(EMBEDDING_SIZE, HIDDEN_SIZE, ACTION_NUMS)
         self._optimizer = tf.keras.optimizers.Adam(learning_rate = LR) 
         self._loss = tf.keras.losses.Huber()
 

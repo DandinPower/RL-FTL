@@ -78,11 +78,11 @@ def GetTargetAnswer():
     entries.Write(TARGET_ANSWER_PATH)
 
 def main():
-    #agent = InferenceAgent()
-    #agent.Inference()
+    agent = InferenceAgent()
+    agent.Inference()
     #CheckFidFrequency()
     #CheckLBADIFF()
-    CheckBytes()
+    #CheckBytes()
 
 if __name__ == "__main__":
     main()

@@ -1,4 +1,5 @@
 from ..environment.environment import Environment, ActionSpace
+from ..libs.history import ValidationLoader
 from ..libs.history import History
 from .buffer import ReplayBuffer
 from .record import TrainHistory
@@ -21,6 +22,10 @@ BATCH_SIZE = int(os.getenv('BATCH_SIZE'))
 UPADTE_RATE = int(os.getenv('UPDATE_RATE'))
 TRAIN_HISTORY_PATH = os.getenv('TRAIN_HISTORY_PATH')
 INFERENCE_HISTORY_PATH = os.getenv('INFERENCE_HISTORY_PATH')
+VALIDATION = bool(os.getenv('VALIDATION'))
+VALIDATION_CYCLE = int(os.getenv('VALIDATION_CYCLE'))
+VALIDATION_HISTORY = os.getenv('VALIDATION_HISTORY')
+VALIDATION_VISUALIZATION_HISTORY =  os.getenv('VALIDATION_VISUALIZATION_HISTORY')
 
 class Agent:
     def __init__(self):
@@ -30,6 +35,7 @@ class Agent:
         self._trainHistory = TrainHistory()
         self._hyperParameter = HyperParameter()
         self._valueNetworks = ValueNetworks()
+        self._validationLoader = ValidationLoader()
         self._valueNetworks.SetActionSpace(self._environment._actionSpace)
         
     # 每一次的遊戲
@@ -63,12 +69,18 @@ class Agent:
                 self._hyperParameter.UpdateLearningRate(i - WARM_UP_EPISODES + 1)
                 self._valueNetworks.UpdateOptimizerLR(self._hyperParameter._lr)
             train_iter.set_postfix_str(f"reward_sum: {rewardSum}")
+            if VALIDATION and (i % VALIDATION_CYCLE == 0) and i != 0:
+                self._validationLoader.Validation(i, self._valueNetworks)
         self._valueNetworks.SaveWeight()
         self._trainHistory.ShowHistory(TRAIN_HISTORY_PATH)
+        if VALIDATION:
+            self._validationLoader.WriteHistory(VALIDATION_HISTORY)
+            self._validationLoader.DrawHistory(VALIDATION_VISUALIZATION_HISTORY)
 
 class InferenceAgent:
     def __init__(self):
         self._inferenceLoader = InferenceLoader()
+        self._inferenceLoader.Load()
         self._valueNetworks = ValueNetworks()
         self._valueNetworks.SetActionSpace(ActionSpace())
 
@@ -86,7 +98,6 @@ class InferenceAgent:
         plt.savefig("confusion_matrix.png")
 
     def Inference(self):
-        self._inferenceLoader.Load()
         self._valueNetworks.LoadWeight()
         yTarget = self._inferenceLoader._Y
         xTarget = self._inferenceLoader._X

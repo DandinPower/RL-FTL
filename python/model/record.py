@@ -34,7 +34,7 @@ class TrainHistory:
         fig = plt.figure(1, figsize=(15, 7))
         plt.clf()
         ax1 = fig.add_subplot(111)
-        ax1.set_ylim(-25 * 100, 25 * 100)
+        ax1.set_ylim(-30 * 100, 40 * 100)
         ax1.plot(self.actions, color="C1", alpha=0.2)
         ax1.plot(self.rewards, color="C2", alpha=0.2)
         plt.title('Training...')
@@ -50,3 +50,4 @@ class TrainHistory:
         labs = [l.get_label() for l in lines]
         ax1.legend(lines, labs, loc=3)
         plt.savefig(path)
+        plt.clf()
