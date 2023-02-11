@@ -46,7 +46,7 @@ class TrainHistory:
         ax2.set_ylabel('Epsilon & Hot Block & HotBytes')
         lines.append(ax2.plot(self.epsilon, label="epsilon", color="C3")[0])
         lines.append(ax2.plot(self.hotBlock, label="block ratio", color="purple")[0])
-        lines.append(ax2.plot(self.hotBytes, label="bytes ratio", color="yellow")[0])
+        #lines.append(ax2.plot(self.hotBytes, label="bytes ratio", color="yellow")[0])
         labs = [l.get_label() for l in lines]
         ax1.legend(lines, labs, loc=3)
         plt.savefig(path)

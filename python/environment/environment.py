@@ -67,9 +67,9 @@ class Environment:
     # 回傳reward, nextState
     def Step(self, action):
         dynamicReward = self._dynamicReward.Step(self._tempState.trace, action)
-        (hotDuplicateOffset, coldDuplicateOffset) = self._memory.WriteTrace(self._tempState.trace, action)
-        reward = self._scaler.GetWriteReward(hotDuplicateOffset, coldDuplicateOffset)
-        reward += dynamicReward
+        #(hotDuplicateOffset, coldDuplicateOffset) = self._memory.WriteTrace(self._tempState.trace, action)
+        #reward = self._scaler.GetWriteReward(hotDuplicateOffset, coldDuplicateOffset)
+        #reward += dynamicReward
+        reward = dynamicReward
         self._tempState = self._stateLoader.GetState()
         return reward, self._stateLoader.Preprocess(self._tempState)
-

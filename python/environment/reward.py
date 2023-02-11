@@ -16,6 +16,8 @@ READ_ON_COLD_MIN = int(os.getenv('READ_ON_COLD_MIN'))
 
 NOT_ACCESS_IS_COLD = int(os.getenv('NOT_ACCESS_IS_COLD'))
 NOT_ACCESS_IS_HOT = int(os.getenv('NOT_ACCESS_IS_HOT'))
+ACCESS_IS_COLD = int(os.getenv('ACCESS_IS_COLD'))
+ACCESS_IS_HOT = int(os.getenv('ACCESS_IS_HOT'))
 
 class RewardScaler:
     def __init__(self):
@@ -52,11 +54,17 @@ class FixRewardQueue:
         self.queue.clear()
 
     # type為true代表沒被access到且為hot
-    def AddNewReward(self, type):
+    def AddNewReward(self, type, action):
         if type:
-            self.queue.append(NOT_ACCESS_IS_HOT)
+            if action:
+                self.queue.append(ACCESS_IS_HOT)
+            else:
+                self.queue.append(ACCESS_IS_COLD)
         else:
-            self.queue.append(NOT_ACCESS_IS_COLD)
+            if action:
+                self.queue.append(NOT_ACCESS_IS_HOT)
+            else:
+                self.queue.append(NOT_ACCESS_IS_COLD)
 
     def GetReward(self):
         return self.queue.pop()
@@ -81,8 +89,7 @@ class DynamicFixReward:
         if self._entries.GetFinishLength() > 0:
             finishEntries = self._entries.GetFinishEntriesAndClear()
             for entry in finishEntries:
-                if entry._type == False:
-                    self._fixReward.AddNewReward(entry._action)
+                self._fixReward.AddNewReward(entry._type, entry._action)
         if len(self._fixReward) > 0:
             reward = self._fixReward.GetReward()
         return reward
